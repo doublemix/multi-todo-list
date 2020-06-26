@@ -1,6 +1,6 @@
 <template>
   <div class="todo-list-switcher">
-    <div class="switcher-box">
+    <div class="switcher-box" :class="{ 'dropdown-shown': dropdownShown }">
       <contenteditable tag="div" class="switcher" v-model="currentList.name"/>
       <div class="dropdown-handle" @click="toggleDropdown">
         <svg width="10" height="5">
@@ -114,27 +114,35 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../styles";
+
 .switcher-box {
   display: flex;
   flex-flow: row nowrap;
   position: relative;
 }
+
+$switcher-box-border-radius: $standard-border-radius;
 .switcher,
 .dropdown-handle,
 .add-handle {
-  padding: 3px;
+  padding: $switcher-box-border-radius;
   border: 1px solid black;
 
   &:first-child {
-    border-top-left-radius: 3px;
-    border-bottom-left-radius: 3px;
+    border-top-left-radius: $switcher-box-border-radius;
+    border-bottom-left-radius: $switcher-box-border-radius;
   }
   &:not(:first-child) {
     border-left: none;
   }
   &:last-child {
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
+    border-top-right-radius: $switcher-box-border-radius;
+    border-bottom-right-radius: $switcher-box-border-radius;
+  }
+  .dropdown-shown & {
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
   }
 }
 .switcher {
@@ -158,7 +166,6 @@ export default {
 
 .dropdown-list-container {
   position: absolute;
-  padding-top: 10px;
   top: 100%;
   left: 0;
   right: 0;
@@ -166,9 +173,10 @@ export default {
 }
 .dropdown-list {
   border: 1px solid black;
-  border-radius: 3px;
+  border-top: none;
+  border-bottom-left-radius: $switcher-box-border-radius;
+  border-bottom-right-radius: $switcher-box-border-radius;
   background: white;
-  box-shadow: 0px 0px 3px black;
 }
 .dropdown-item {
   padding: 10px;

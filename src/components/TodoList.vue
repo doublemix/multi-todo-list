@@ -61,12 +61,14 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "../styles";
+
 .input {
   border: 1px solid black;
-  border-radius: 3px;
+  border-radius: $standard-border-radius;
   margin: 5px 0;
-  padding: 3px;
+  padding: $standard-border-radius;
   white-space: pre;
 }
 </style>
