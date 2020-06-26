@@ -74,7 +74,7 @@ export default {
       return this.nextId++;
     },
     onNewItem(itemText) {
-      this.currentList.items.push({ id: this.getNextId(), text: itemText });
+      this.currentList.items.unshift({ id: this.getNextId(), text: itemText });
     },
     onDeleteItem({ id }) {
       this.currentList.items = this.currentList.items.filter(
