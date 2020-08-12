@@ -1,7 +1,7 @@
 <template>
   <div class="todo-list-switcher">
     <div class="switcher-box" :class="{ 'dropdown-shown': dropdownShown }">
-      <contenteditable tag="div" class="switcher" v-model="currentList.name"/>
+      <contenteditable ref="listName" tag="div" class="switcher" v-model="currentList.name" noNL/>
       <div class="dropdown-handle" @click="toggleDropdown">
         <svg width="10" height="5">
           <path v-if="!dropdownShown" d="M 0 0 L 5 5 L 10 0 Z" fill="black"></path>
@@ -69,6 +69,12 @@ export default {
     }
   },
 
+  mounted() {
+    this.$nextTick(() => {
+      window.listNameEl = this.$refs.listName.$el;
+    });
+  },
+
   methods: {
     getNextId() {
       return this.nextId++;
@@ -92,10 +98,19 @@ export default {
       const newId = this.getNextId();
       this.todoLists.push({
         id: newId,
-        name: `New List #${newId}`,
+        name: `New List`,
         items: []
       });
       this.currentListId = newId;
+      const listNameEl = this.$refs.listName.$el;
+      this.$nextTick(() => {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(listNameEl);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        listNameEl.focus();
+      });
     },
     toggleDropdown() {
       this.switching = true;
