@@ -15,8 +15,10 @@
         v-for="item of items"
         :key="item.id"
         v-bind="item"
+        draggable
         @delete="deleteItem"
         @update="updateItem"
+        @move="moveItem"
       />
     </ul>
   </div>
@@ -56,6 +58,9 @@ export default {
     onUpdate(event) {
       this.newText = event.target.innerText;
       console.log(document.getSelection().toString());
+    },
+    moveItem(arg) {
+      this.$emit("move", arg);
     }
   }
 };

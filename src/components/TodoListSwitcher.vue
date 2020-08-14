@@ -35,6 +35,7 @@
       @new-item="onNewItem"
       @delete="onDeleteItem"
       @update="onUpdateItem"
+      @move="onMoveItem"
     />
   </div>
 </template>
@@ -93,6 +94,16 @@ export default {
           it.text = text;
         }
       });
+    },
+    onMoveItem({ id, toId }) {
+      const items = this.currentList.items;
+      const fromIndex = items.findIndex(it => `${it.id}` === `${id}`);
+      const toIndex = items.findIndex(it => `${it.id}` === `${toId}`);
+      if (toIndex !== fromIndex) {
+        const item = items[fromIndex];
+        items.splice(fromIndex, 1);
+        items.splice(toIndex, 0, item);
+      }
     },
     onNewList() {
       const newId = this.getNextId();

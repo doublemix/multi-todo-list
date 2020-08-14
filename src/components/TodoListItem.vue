@@ -1,5 +1,11 @@
 <template>
-  <div class="todo-list-item">
+  <div
+    class="todo-list-item"
+    draggable
+    @dragstart="startDragging"
+    @dragover="acceptDrag"
+    @drop="handleDrop"
+  >
     <contenteditable tag="div" type="text" :value="text" @input="updateItem" noNL noHTML></contenteditable>
     <div class="delete-item-container" @click="deleteItem">
       <svg width="10" height="10">
@@ -46,6 +52,20 @@ export default {
     },
     updateItem(newText) {
       this.$emit("update", { id: this.id, text: newText });
+    },
+
+    startDragging(event) {
+      event.dataTransfer.setData("type", "list-item-move");
+      event.dataTransfer.setData("itemId", this.id);
+    },
+    acceptDrag(event) {
+      event.preventDefault();
+    },
+    handleDrop(event) {
+      if (event.dataTransfer.getData("type") === "list-item-move") {
+        const droppedItemId = event.dataTransfer.getData("itemId");
+        this.$emit("move", { id: droppedItemId, toId: this.id });
+      }
     }
   }
 };
