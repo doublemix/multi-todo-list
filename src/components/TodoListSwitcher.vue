@@ -3,10 +3,8 @@
     <div class="switcher-box" :class="{ 'dropdown-shown': dropdownShown }">
       <contenteditable ref="listName" tag="div" class="switcher" v-model="currentListName" noNL/>
       <div class="dropdown-handle" @click="toggleDropdown">
-        <svg width="10" height="5">
-          <path v-if="!dropdownShown" d="M 0 0 L 5 5 L 10 0 Z" fill="black"></path>
-          <path v-if="dropdownShown" d="M 0 5 L 5 0 L 10 5 Z" fill="black"></path>
-        </svg>
+        <icon-arrowhead-down v-if="!dropdownShown"/>
+        <icon-arrowhead-up v-if="dropdownShown"/>
       </div>
       <div v-if="dropdownShown" class="dropdown-list-container">
         <div v-click-outside="hideList" class="dropdown-list">
@@ -22,12 +20,7 @@
         </div>
       </div>
       <div class="add-handle" @click="onNewList">
-        <svg width="10" height="10">
-          <path
-            d="M 4 0 L 4 4 L 0 4 L 0 6 L 4 6 L 4 10 L 6 10 L 6 6 L 10 6 L 10 4 L 6 4 L 6 0 Z"
-            fill="black"
-          ></path>
-        </svg>
+        <icon-plus/>
       </div>
     </div>
     <todo-list v-if="currentList" :id="currentList.id"/>
