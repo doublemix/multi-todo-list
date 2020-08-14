@@ -11,7 +11,7 @@ Vue.config.productionTip = false;
 Vue.use(contenteditable);
 Vue.directive("click-outside", ClickOutside);
 
-Vue.filter("json", (it) => JSON.stringify(it));
+Vue.filter("json", (it, spaces) => JSON.stringify(it, undefined, spaces));
 
 new Vue({
   store,

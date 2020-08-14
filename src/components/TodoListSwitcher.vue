@@ -1,7 +1,18 @@
 <template>
   <div class="todo-list-switcher">
-    <div class="switcher-box" :class="{ 'dropdown-shown': dropdownShown }">
-      <contenteditable ref="listName" tag="div" class="switcher" v-model="currentListName" noNL/>
+    <div
+      class="switcher-box"
+      :class="{ 'dropdown-shown': dropdownShown, 'none-selected': currentList == null }"
+    >
+      <contenteditable
+        v-if="currentList"
+        ref="listName"
+        tag="div"
+        class="switcher"
+        v-model="currentListName"
+        noNL
+      />
+      <div class="switcher" v-else>Create or Select a List</div>
       <div class="dropdown-handle" @click="toggleDropdown">
         <icon-arrowhead-down v-if="!dropdownShown"/>
         <icon-arrowhead-up v-if="dropdownShown"/>
@@ -12,7 +23,7 @@
             <div
               :key="item.id"
               class="dropdown-item"
-              :class="{ 'current-dropdown-item': item.id === currentList.id
+              :class="{ 'current-dropdown-item': item.id === currentListId
             }"
               @click="onClickList(item.id)"
             >{{ item.name }}</div>
@@ -21,6 +32,9 @@
       </div>
       <div class="add-handle" @click="onNewList">
         <icon-plus/>
+      </div>
+      <div class="delete-handle" :disabled="currentList == null" @click="onDeleteList">
+        <icon-cross/>
       </div>
     </div>
     <todo-list v-if="currentList" :id="currentList.id"/>
@@ -64,23 +78,23 @@ export default {
       set(newValue) {
         this.updateListName({ listId: this.currentList.id, name: newValue });
       }
+    },
+    currentListId() {
+      if (this.currentList) {
+        return this.currentList.id;
+      }
+      return null;
     }
   },
 
-  mounted() {
-    this.$nextTick(() => {
-      window.listNameEl = this.$refs.listName.$el;
-    });
-  },
-
   methods: {
-    ...mapActions(["addList", "updateListName", "switchToList"]),
+    ...mapActions(["addList", "deleteList", "updateListName", "switchToList"]),
     async onNewList() {
       const listId = await this.addList();
       this.switchToList({ listId });
 
-      const listNameEl = this.$refs.listName.$el;
       this.$nextTick(() => {
+        const listNameEl = this.$refs.listName.$el;
         const selection = window.getSelection();
         const range = document.createRange();
         range.selectNodeContents(listNameEl);
@@ -88,6 +102,13 @@ export default {
         selection.addRange(range);
         listNameEl.focus();
       });
+    },
+    onDeleteList() {
+      if (this.currentList == null) {
+        return;
+      }
+      this.deleteList({ listId: this.currentList.id });
+      this.switchToList({ listId: null });
     },
     toggleDropdown() {
       this.switching = true;
@@ -121,7 +142,8 @@ export default {
 $switcher-box-border-radius: $standard-border-radius;
 .switcher,
 .dropdown-handle,
-.add-handle {
+.add-handle,
+.delete-handle {
   padding: $switcher-box-border-radius;
   border: 1px solid black;
 
@@ -144,20 +166,21 @@ $switcher-box-border-radius: $standard-border-radius;
 .switcher {
   flex: 1;
 }
-.dropdown-handle {
-  min-width: 20px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.switcher-box.none-selected {
+  background: #EEE;
 }
-
-.add-handle {
+.dropdown-handle,
+.add-handle,
+.delete-handle {
   min-width: 20px;
 
   display: flex;
   align-items: center;
   justify-content: center;
+  &[disabled] {
+    color: grey;
+    fill: grey;
+  }
 }
 
 .dropdown-list-container {

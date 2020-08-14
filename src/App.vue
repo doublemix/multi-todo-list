@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <todo-list-switcher v-if="currentList"/>
+    <todo-list-switcher/>
   </div>
 </template>
 
@@ -12,18 +12,6 @@ export default {
   name: "App",
   components: {
     TodoListSwitcher
-  },
-  computed: {
-    ...mapGetters(["currentList"])
-  },
-  methods: {
-    ...mapActions(["addList", "switchToList"])
-  },
-  async mounted() {
-    if (this.currentList == null) {
-      const id = await this.addList({ name: "Default" });
-      this.switchToList({ listId: id });
-    }
   }
 };
 </script>

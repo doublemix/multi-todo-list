@@ -24,6 +24,9 @@ const mutations = {
   SET_LIST_NAME(state, { listId, name }) {
     state.itemLists[listId].name = name;
   },
+  DELETE_LIST(state, { listId }) {
+    Vue.delete(state.itemLists, listId);
+  },
   INSERT_ITEM_INTO_LIST(state, { listId, index = 0, itemId }) {
     const list = state.itemLists[listId];
     list.items.splice(index, 0, itemId);
@@ -51,6 +54,9 @@ const mutations = {
 };
 
 const getters = {
+  state(state) {
+    return state;
+  },
   currentList(state, getters) {
     return getters.getItemList(state.currentListId);
   },
@@ -85,6 +91,10 @@ const actions = {
 
   updateListName({ commit }, { listId, name }) {
     commit("SET_LIST_NAME", { listId, name });
+  },
+
+  deleteList({ commit }, { listId }) {
+    commit("DELETE_LIST", { listId });
   },
 
   async addItemToList({ commit, dispatch }, { listId, text }) {
