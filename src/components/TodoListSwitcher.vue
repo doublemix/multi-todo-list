@@ -1,7 +1,7 @@
 <template>
   <div class="todo-list-switcher">
     <div class="switcher-box" :class="{ 'dropdown-shown': dropdownShown }">
-      <contenteditable ref="listName" tag="div" class="switcher" v-model="currentList.name" noNL/>
+      <contenteditable ref="listName" tag="div" class="switcher" v-model="currentListName" noNL/>
       <div class="dropdown-handle" @click="toggleDropdown">
         <svg width="10" height="5">
           <path v-if="!dropdownShown" d="M 0 0 L 5 5 L 10 0 Z" fill="black"></path>
@@ -10,13 +10,13 @@
       </div>
       <div v-if="dropdownShown" class="dropdown-list-container">
         <div v-click-outside="hideList" class="dropdown-list">
-          <template v-for="item of todoLists">
+          <template v-for="item of sortedItemLists">
             <div
               :key="item.id"
               class="dropdown-item"
-              :class="{ 'current-dropdown-item': item.id === currentListId
+              :class="{ 'current-dropdown-item': item.id === currentList.id
             }"
-              @click="currentListId = item.id; dropdownShown = false"
+              @click="onClickList(item.id)"
             >{{ item.name }}</div>
           </template>
         </div>
@@ -30,18 +30,14 @@
         </svg>
       </div>
     </div>
-    <todo-list
-      v-bind="currentList"
-      @new-item="onNewItem"
-      @delete="onDeleteItem"
-      @update="onUpdateItem"
-      @move="onMoveItem"
-    />
+    <todo-list v-if="currentList" :id="currentList.id"/>
   </div>
 </template>
 
 <script>
 import ClickOutside from "vue-click-outside";
+import { mapActions, mapGetters } from "vuex";
+import sortBy from "lodash/sortBy";
 
 import TodoList from "./TodoList";
 
@@ -56,17 +52,25 @@ export default {
 
   data() {
     return {
-      currentListId: 0,
-      todoLists: [{ id: 0, name: "Default", items: [] }],
-      nextId: 1,
       dropdownShown: false,
       switching: false
     };
   },
 
   computed: {
-    currentList() {
-      return this.todoLists.find(it => it.id === this.currentListId);
+    ...mapGetters(["currentList", "itemLists"]),
+
+    sortedItemLists() {
+      return sortBy(this.itemLists, it => it.name.toLowerCase());
+    },
+
+    currentListName: {
+      get() {
+        return this.currentList.name;
+      },
+      set(newValue) {
+        this.updateListName({ listId: this.currentList.id, name: newValue });
+      }
     }
   },
 
@@ -77,42 +81,11 @@ export default {
   },
 
   methods: {
-    getNextId() {
-      return this.nextId++;
-    },
-    onNewItem(itemText) {
-      this.currentList.items.unshift({ id: this.getNextId(), text: itemText });
-    },
-    onDeleteItem({ id }) {
-      this.currentList.items = this.currentList.items.filter(
-        it => it.id !== id
-      );
-    },
-    onUpdateItem({ id, text }) {
-      this.currentList.items.forEach(it => {
-        if (it.id === id) {
-          it.text = text;
-        }
-      });
-    },
-    onMoveItem({ id, toId }) {
-      const items = this.currentList.items;
-      const fromIndex = items.findIndex(it => `${it.id}` === `${id}`);
-      const toIndex = items.findIndex(it => `${it.id}` === `${toId}`);
-      if (toIndex !== fromIndex) {
-        const item = items[fromIndex];
-        items.splice(fromIndex, 1);
-        items.splice(toIndex, 0, item);
-      }
-    },
-    onNewList() {
-      const newId = this.getNextId();
-      this.todoLists.push({
-        id: newId,
-        name: `New List`,
-        items: []
-      });
-      this.currentListId = newId;
+    ...mapActions(["addList", "updateListName", "switchToList"]),
+    async onNewList() {
+      const listId = await this.addList();
+      this.switchToList({ listId });
+
       const listNameEl = this.$refs.listName.$el;
       this.$nextTick(() => {
         const selection = window.getSelection();
@@ -134,6 +107,10 @@ export default {
       if (!this.switching) {
         this.dropdownShown = false;
       }
+    },
+    onClickList(listId) {
+      this.switchToList({ listId });
+      this.dropdownShown = false;
     }
   }
 };

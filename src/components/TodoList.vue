@@ -13,12 +13,11 @@
     <ul>
       <todo-list-item
         v-for="item of items"
-        :key="item.id"
-        v-bind="item"
+        :key="item"
+        :id="item"
         draggable
-        @delete="deleteItem"
-        @update="updateItem"
-        @move="moveItem"
+        @delete="onDeleteItem"
+        @move="onMoveItem"
       />
     </ul>
   </div>
@@ -26,6 +25,7 @@
 
 <script>
 import TodoListItem from "./TodoListItem";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   components: {
@@ -36,7 +36,7 @@ export default {
     json: it => JSON.stringify(it)
   },
 
-  props: ["items"],
+  props: ["id"],
 
   data() {
     return {
@@ -44,23 +44,31 @@ export default {
     };
   },
 
+  computed: {
+    ...mapGetters(["getItemList"]),
+
+    list() {
+      return this.getItemList(this.id);
+    },
+    items() {
+      return this.list.items;
+    }
+  },
+
   methods: {
+    ...mapActions(["addItemToList", "deleteItemFromList", "moveItemInList"]),
     submit() {
-      this.$emit("new-item", this.newText);
+      this.addItemToList({ listId: this.id, text: this.newText });
       this.newText = "";
     },
-    deleteItem(arg) {
-      this.$emit("delete", arg);
+    onDeleteItem({ id: itemId }) {
+      this.deleteItemFromList({ listId: this.id, itemId });
     },
-    updateItem(arg) {
-      this.$emit("update", arg);
+    onMoveItem({ id: itemId, toId: toItemId }) {
+      this.moveItemInList({ listId: this.id, itemId, toItemId });
     },
     onUpdate(event) {
       this.newText = event.target.innerText;
-      console.log(document.getSelection().toString());
-    },
-    moveItem(arg) {
-      this.$emit("move", arg);
     }
   }
 };

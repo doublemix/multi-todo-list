@@ -1,16 +1,31 @@
 <template>
   <div id="app">
-    <todo-list-switcher/>
+    <todo-list-switcher v-if="currentList"/>
   </div>
 </template>
 
 <script>
 import TodoListSwitcher from "./components/TodoListSwitcher";
+import { mapGetters, mapActions, mapState } from "vuex";
 
 export default {
   name: "App",
   components: {
     TodoListSwitcher
+  },
+  computed: {
+    ...mapGetters(["currentList"]),
+    ...mapState(["currentListId", "items", "itemLists"])
+  },
+  methods: {
+    ...mapActions(["addList", "switchToList"])
+  },
+  async mounted() {
+    if (this.currentList == null) {
+      const id = await this.addList({ name: "Default" });
+      console.log(id);
+      this.switchToList({ listId: id });
+    }
   }
 };
 </script>

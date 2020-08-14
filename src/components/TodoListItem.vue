@@ -6,8 +6,8 @@
     @dragover="acceptDrag"
     @drop="handleDrop"
   >
-    <contenteditable tag="div" type="text" :value="text" @input="updateItem" noNL noHTML></contenteditable>
-    <div class="delete-item-container" @click="deleteItem">
+    <contenteditable tag="div" type="text" v-model="text" noNL noHTML></contenteditable>
+    <div class="delete-item-container" @click="onDeleteItem">
       <svg width="10" height="10">
         <path d="M 0 2 L 8 10 L 10 8 L 2 0 Z M 0 8 L 2 10 L 10 2 L 8 0 Z"></path>
       </svg>
@@ -39,19 +39,32 @@
 </style>
 
 <script>
+import { mapActions, mapGetters } from "vuex";
+
 export default {
-  props: ["id", "text"],
-  data() {
-    return {
-      workingText: this.text
-    };
-  },
-  methods: {
-    deleteItem() {
-      this.$emit("delete", { id: this.id });
+  props: ["id"],
+
+  computed: {
+    ...mapGetters(["getItem"]),
+
+    item() {
+      return this.getItem(this.id);
     },
-    updateItem(newText) {
-      this.$emit("update", { id: this.id, text: newText });
+    text: {
+      get() {
+        return this.item.text;
+      },
+      set(newValue) {
+        this.updateItemText({ itemId: this.id, text: newValue });
+      }
+    }
+  },
+
+  methods: {
+    ...mapActions(["updateItemText"]),
+
+    onDeleteItem() {
+      this.$emit("delete", { id: this.id });
     },
 
     startDragging(event) {
@@ -63,7 +76,7 @@ export default {
     },
     handleDrop(event) {
       if (event.dataTransfer.getData("type") === "list-item-move") {
-        const droppedItemId = event.dataTransfer.getData("itemId");
+        const droppedItemId = +event.dataTransfer.getData("itemId");
         this.$emit("move", { id: droppedItemId, toId: this.id });
       }
     }
