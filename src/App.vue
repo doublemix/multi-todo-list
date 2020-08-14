@@ -6,7 +6,7 @@
 
 <script>
 import TodoListSwitcher from "./components/TodoListSwitcher";
-import { mapGetters, mapActions, mapState } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   name: "App",
@@ -14,8 +14,7 @@ export default {
     TodoListSwitcher
   },
   computed: {
-    ...mapGetters(["currentList"]),
-    ...mapState(["currentListId", "items", "itemLists"])
+    ...mapGetters(["currentList"])
   },
   methods: {
     ...mapActions(["addList", "switchToList"])
@@ -23,7 +22,6 @@ export default {
   async mounted() {
     if (this.currentList == null) {
       const id = await this.addList({ name: "Default" });
-      console.log(id);
       this.switchToList({ listId: id });
     }
   }

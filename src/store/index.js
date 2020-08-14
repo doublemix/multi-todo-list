@@ -72,8 +72,8 @@ const actions = {
   moveItemInList({ getters }, { listId, itemId, toItemId }) {
     const list = getters.getItemList(listId);
     const items = list.items;
-    const fromIndex = items.findIndex((it) => `${it}` === `${itemId}`);
-    const toIndex = items.findIndex((it) => `${it}` === `${toItemId}`);
+    const fromIndex = items.findIndex((it) => it === itemId);
+    const toIndex = items.findIndex((it) => it === toItemId);
     if (fromIndex === toIndex) return;
     items.splice(fromIndex, 1);
     items.splice(toIndex, 0, itemId);
