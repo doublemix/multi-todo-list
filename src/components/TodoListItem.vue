@@ -1,38 +1,47 @@
 <template>
-  <div
-    class="todo-list-item"
-    draggable
-    @dragstart="startDragging"
-    @dragover="acceptDrag"
-    @drop="handleDrop"
-  >
-    <contenteditable tag="div" type="text" v-model="text" noNL noHTML></contenteditable>
-    <div class="delete-item-container" @click="onDeleteItem">
-      <icon-cross/>
+  <li>
+    <div
+      class="todo-list-item"
+      draggable
+      @dragstart="startDragging"
+      @dragover="acceptDrag"
+      @drop="handleDrop"
+    >
+      <div class="item-action prefix">
+        <input type="checkbox" v-model="completed">
+      </div>
+      <contenteditable class="editor" tag="div" type="text" v-model="text" noNL noHTML></contenteditable>
+      <div class="item-action delete-item-action" @click="onDeleteItem">
+        <icon-times/>
+      </div>
     </div>
-  </div>
+  </li>
 </template>
 
-<style>
+<style lang="scss">
 .todo-list-item {
-  display: list-item;
-  position: relative;
-  padding-right: 20px;
-}
-.delete-item-container {
-  position: absolute;
-  right: 5px;
-  top: 0;
-  bottom: 0;
+  display: flex;
+  flex-flow: row nowrap;
 
+  &:hover {
+    background: #CCE;
+  }
+}
+.editor {
+  flex: 1;
+}
+.item-action {
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
-}
-.delete-item {
-  width: 10px;
-  height: 10px;
-  background: red;
+
+  $margin: 10px;
+  &:not(.prefix) {
+    margin-left: $margin;
+  }
+  &.prefix {
+    margin-right: $margin;
+  }
 }
 </style>
 
@@ -48,6 +57,14 @@ export default {
     item() {
       return this.getItem(this.id);
     },
+    completed: {
+      get() {
+        return this.item.completed || false;
+      },
+      set(newValue) {
+        this.updateItemCompleted({ itemId: this.id, completed: newValue });
+      }
+    },
     text: {
       get() {
         return this.item.text;
@@ -59,7 +76,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(["updateItemText"]),
+    ...mapActions(["updateItemText", "updateItemCompleted"]),
 
     onDeleteItem() {
       this.$emit("delete", { id: this.id });
