@@ -10,7 +10,7 @@
       noHTML
       @keydown.enter="submit"
     ></contenteditable>
-    <ul>
+    <ul class="todo-list-body">
       <todo-list-item
         v-for="item of items"
         :key="item"
@@ -58,7 +58,11 @@ export default {
   methods: {
     ...mapActions(["addItemToList", "deleteItemFromList", "moveItemInList"]),
     submit() {
-      this.addItemToList({ listId: this.id, text: this.newText });
+      const val = this.newText.trim();
+      if (val === "") {
+        return;
+      }
+      this.addItemToList({ listId: this.id, text: val });
       this.newText = "";
     },
     onDeleteItem({ id: itemId }) {
@@ -82,6 +86,10 @@ export default {
   border-radius: $standard-border-radius;
   margin: 5px 0;
   padding: $standard-border-radius;
-  white-space: pre;
+  white-space: pre-wrap;
+}
+.todo-list-body {
+  list-style: none;
+  padding-left: 0;
 }
 </style>

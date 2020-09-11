@@ -19,6 +19,13 @@
 </template>
 
 <style lang="scss">
+li {
+  $separatorStyle: 1px solid #DDD;
+  &:first-child {
+    border-top: $separatorStyle;
+  }
+  border-bottom: $separatorStyle;
+}
 .todo-list-item {
   display: flex;
   flex-flow: row nowrap;
@@ -41,6 +48,10 @@
   }
   &.prefix {
     margin-right: $margin;
+  }
+
+  svg {
+    margin: 3px;
   }
 }
 </style>

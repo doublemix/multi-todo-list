@@ -34,7 +34,7 @@
         <icon-plus/>
       </div>
       <div class="delete-handle" :disabled="currentList == null" @click="onDeleteList">
-        <icon-cross/>
+        <icon-times/>
       </div>
     </div>
     <todo-list v-if="currentList" :id="currentList.id"/>

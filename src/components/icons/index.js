@@ -3,13 +3,13 @@ import Vue from "vue";
 import ArrowheadUp from "./ArrowheadUp";
 import ArrowheadDown from "./ArrowheadDown";
 import Plus from "./Plus";
-import Cross from "./Cross";
+import Times from "./Times";
 
 const icons = {
   IconArrowheadUp: ArrowheadUp,
   IconArrowheadDown: ArrowheadDown,
   IconPlus: Plus,
-  IconCross: Cross
+  IconTimes: Times
 };
 
 Object.entries(icons).forEach(([componentName, component]) => {
