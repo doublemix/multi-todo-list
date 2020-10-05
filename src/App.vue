@@ -1,8 +1,9 @@
 <template>
   <div id="app">
     <div id="container">
-      <todo-list-switcher/>
+      <todo-list-switcher />
     </div>
+    <portal-target name="overlay"></portal-target>
   </div>
 </template>
 
@@ -12,8 +13,8 @@ import TodoListSwitcher from "./components/TodoListSwitcher";
 export default {
   name: "App",
   components: {
-    TodoListSwitcher
-  }
+    TodoListSwitcher,
+  },
 };
 </script>
 

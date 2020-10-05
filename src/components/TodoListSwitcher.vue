@@ -2,7 +2,10 @@
   <div class="todo-list-switcher">
     <div
       class="switcher-box"
-      :class="{ 'dropdown-shown': dropdownShown, 'none-selected': currentList == null }"
+      :class="{
+        'dropdown-shown': dropdownShown,
+        'none-selected': currentList == null,
+      }"
     >
       <contenteditable
         v-if="currentList"
@@ -14,8 +17,8 @@
       />
       <div class="switcher" v-else>Create or Select a List</div>
       <div class="dropdown-handle" @click="toggleDropdown">
-        <icon-arrowhead-down v-if="!dropdownShown"/>
-        <icon-arrowhead-up v-if="dropdownShown"/>
+        <icon-arrowhead-down v-if="!dropdownShown" />
+        <icon-arrowhead-up v-if="dropdownShown" />
       </div>
       <div v-if="dropdownShown" class="dropdown-list-container">
         <div v-click-outside="hideList" class="dropdown-list">
@@ -23,21 +26,51 @@
             <div
               :key="item.id"
               class="dropdown-item"
-              :class="{ 'current-dropdown-item': item.id === currentListId
-            }"
+              :class="{ 'current-dropdown-item': item.id === currentListId }"
               @click="onClickList(item.id)"
-            >{{ item.name }}</div>
+            >
+              {{ item.name }}
+            </div>
           </template>
         </div>
       </div>
       <div class="add-handle" @click="onNewList">
-        <icon-plus/>
+        <icon-plus />
       </div>
-      <div class="delete-handle" :disabled="currentList == null" @click="onDeleteList">
-        <icon-times/>
+      <div
+        class="delete-handle"
+        :disabled="currentList == null"
+        @click="onDeleteList"
+      >
+        <icon-times />
       </div>
     </div>
-    <todo-list v-if="currentList" :id="currentList.id"/>
+    <todo-list v-if="currentList" :id="currentList.id" />
+    <base-modal v-model="deleteModal">
+      <div
+        style="
+          background: white;
+          border-radius: 3px;
+          padding: 10px;
+          box-shadow: 0 1px 3px 1px #004;
+        "
+      >
+        Are you sure you want to delete this list?<br />
+        This cannot be undone!
+        <hr />
+        <div
+          style="
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: flex-end;
+          "
+        >
+          <button @click="confirmDelete">Delete</button>
+          <div style="width: 5px"></div>
+          <button @click="cancelDelete">Cancel</button>
+        </div>
+      </div>
+    </base-modal>
   </div>
 </template>
 
@@ -47,20 +80,23 @@ import { mapActions, mapGetters } from "vuex";
 import sortBy from "lodash/sortBy";
 
 import TodoList from "./TodoList";
+import BaseModal from "./BaseModal";
 
 export default {
   components: {
-    TodoList
+    TodoList,
+    BaseModal,
   },
 
   directives: {
-    ClickOutside
+    ClickOutside,
   },
 
   data() {
     return {
       dropdownShown: false,
-      switching: false
+      deleteModal: false,
+      switching: false,
     };
   },
 
@@ -68,7 +104,7 @@ export default {
     ...mapGetters(["currentList", "itemLists"]),
 
     sortedItemLists() {
-      return sortBy(this.itemLists, it => it.name.toLowerCase());
+      return sortBy(this.itemLists, (it) => it.name.toLowerCase());
     },
 
     currentListName: {
@@ -77,14 +113,14 @@ export default {
       },
       set(newValue) {
         this.updateListName({ listId: this.currentList.id, name: newValue });
-      }
+      },
     },
     currentListId() {
       if (this.currentList) {
         return this.currentList.id;
       }
       return null;
-    }
+    },
   },
 
   methods: {
@@ -104,6 +140,18 @@ export default {
       });
     },
     onDeleteList() {
+      if (this.currentList != null) {
+        this.deleteModal = true;
+      }
+    },
+    confirmDelete() {
+      this.deleteCurrentList();
+      this.deleteModal = false;
+    },
+    cancelDelete() {
+      this.deleteModal = false;
+    },
+    deleteCurrentList() {
       if (this.currentList == null) {
         return;
       }
@@ -125,8 +173,8 @@ export default {
     onClickList(listId) {
       this.switchToList({ listId });
       this.dropdownShown = false;
-    }
-  }
+    },
+  },
 };
 </script>
 
