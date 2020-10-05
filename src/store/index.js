@@ -44,9 +44,12 @@ const mutations = {
   SET_ITEM(state, { itemId, item }) {
     Vue.set(state.items, itemId, item);
   },
-  UPDATE_ITEM_TEXT(state, { itemId, text }) {
-    const item = state.items[itemId];
-    item.text = text;
+  UPDATE_ITEM(state, { itemId, payload }) {
+    const prevItem = state.items[itemId];
+    Vue.set(state.items, itemId, {
+      ...prevItem,
+      ...payload
+    });
   },
   DELETE_ITEM(state, { itemId }) {
     Vue.delete(state.items, itemId);
@@ -113,7 +116,11 @@ const actions = {
   },
 
   updateItemText({ commit }, { itemId, text }) {
-    commit("UPDATE_ITEM_TEXT", { itemId, text });
+    commit("UPDATE_ITEM", { itemId, payload: { text } });
+  },
+
+  updateItemCompleted({ commit }, { itemId, completed }) {
+    commit("UPDATE_ITEM", { itemId, payload: { completed } });
   },
 
   moveItemInList({ commit, getters }, { listId, itemId, toItemId }) {
