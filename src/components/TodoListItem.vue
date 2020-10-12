@@ -8,11 +8,18 @@
       @drop="handleDrop"
     >
       <div class="item-action prefix">
-        <input type="checkbox" v-model="completed">
+        <input type="checkbox" v-model="completed" />
       </div>
-      <contenteditable class="editor" tag="div" type="text" v-model="text" noNL noHTML></contenteditable>
+      <contenteditable
+        class="editor"
+        tag="div"
+        type="text"
+        v-model="text"
+        noNL
+        noHTML
+      ></contenteditable>
       <div class="item-action delete-item-action" @click="onDeleteItem">
-        <icon-times/>
+        <icon-times />
       </div>
     </div>
   </li>
@@ -36,6 +43,7 @@ li {
 }
 .editor {
   flex: 1;
+  padding: 0 5px;
 }
 .item-action {
   display: flex;
@@ -74,7 +82,7 @@ export default {
       },
       set(newValue) {
         this.updateItemCompleted({ itemId: this.id, completed: newValue });
-      }
+      },
     },
     text: {
       get() {
@@ -82,8 +90,8 @@ export default {
       },
       set(newValue) {
         this.updateItemText({ itemId: this.id, text: newValue });
-      }
-    }
+      },
+    },
   },
 
   methods: {
@@ -105,8 +113,8 @@ export default {
         const droppedItemId = +event.dataTransfer.getData("itemId");
         this.$emit("move", { id: droppedItemId, toId: this.id });
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
